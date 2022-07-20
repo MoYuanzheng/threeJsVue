@@ -1,9 +1,7 @@
 import {
   AmbientLight,
-  AmbientLightProbe,
   AxesHelper,
   BoxBufferGeometry,
-  Camera,
   GridHelper,
   Mesh,
   MeshNormalMaterial,
@@ -12,6 +10,8 @@ import {
   Vector3,
   WebGLRenderer,
 } from "three";
+
+import Stats from "three/examples/jsm/libs/stats.module";
 
 export class TEngine {
   private dom: HTMLElement;
@@ -41,22 +41,35 @@ export class TEngine {
     const gridHelper: GridHelper = new GridHelper(
       500,
       100,
-      "rgb(100,100,100)",
-      "rgb(50,50,50)"
+      "rgb(100,12,222)",
+      "rgb(50,150,5)"
     );
     this.scene.add(box);
+    this.scene.add(ambientLight);
     this.scene.add(axesHelper);
     this.scene.add(gridHelper);
+    //性能监视器
+    const stats = Stats();
+    const statsDom = stats.domElement;
+    statsDom.style.position = "fixed";
+    statsDom.style.top = "0";
+    statsDom.style.right = "5px";
+    statsDom.style.left = "unset";
 
-    dom.appendChild(this.renderer.domElement);
     this.camera.position.set(50, 50, 50);
     this.camera.lookAt(new Vector3(0, 0, 0));
     this.camera.up = new Vector3(1, 1, 1);
-
-    // this.renderer.setClearColor("rgb(255,255,255)");
-    // this.renderer.clearColor;
     this.renderer.setSize(dom.offsetWidth, dom.offsetHeight, true);
-    this.renderer.render(this.scene, this.camera);
-    console.log(dom);
+
+    const renderfun = () => {
+      box.position.x += 0.01;
+      this.camera.position.x += 0.01;
+      this.renderer.render(this.scene, this.camera);
+      stats.update();
+      requestAnimationFrame(renderfun);
+    };
+    renderfun();
+    dom.appendChild(this.renderer.domElement);
+    dom.appendChild(statsDom);
   }
 }
