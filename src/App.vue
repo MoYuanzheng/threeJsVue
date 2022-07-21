@@ -6,6 +6,7 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, ref } from 'vue'
+import { basicObjectsList } from './assets/ts/TBasicObject'
 import { TEngine } from './assets/ts/TEngine'
 
 export default defineComponent({
@@ -13,6 +14,7 @@ export default defineComponent({
     const threeTarget = ref(null)
     onMounted(() => {
       const TE = new TEngine(threeTarget.value)
+      TE.addObject(...basicObjectsList)
     })
 
     return {
