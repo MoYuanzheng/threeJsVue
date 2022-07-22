@@ -93,6 +93,10 @@ export class TEngine {
 
     //添加鼠标事件
     const mouse = new Vector2();
+
+    //临时缓存对象
+    let objCache: Object3D | null = null;
+
     this.renderer.domElement.addEventListener("mousemove", (event) => {
       const domx = event.offsetX;
       const domy = event.offsetY;
@@ -101,6 +105,47 @@ export class TEngine {
       mouse.x = (domx / width) * 2 - 1;
       mouse.y = (-domy * 2) / height + 1;
       //console.log(mouse.x, mouse.y);
+
+      //鼠标移入会变色
+      raycaster.setFromCamera(mouse, this.camera);
+      //规避变换控制器遮挡问题
+      this.scene.remove(transformControls);
+      //第二个参数 只拾取射线第一个穿过的对象
+      const interSection = raycaster.intersectObjects(
+        this.scene.children,
+        true
+      );
+      this.scene.add(transformControls);
+
+      if (interSection.length) {
+        const object = interSection[0].object;
+
+        if (object !== objCache) {
+          if (objCache) {
+            objCache.dispatchEvent({
+              type: "mouseleave",
+            });
+          }
+
+          object.dispatchEvent({
+            type: "mouseenter",
+          });
+
+          objCache = object;
+        } else if (objCache === object) {
+          object.dispatchEvent({
+            type: "mousemove",
+          });
+        }
+      } else {
+        if (objCache) {
+          objCache.dispatchEvent({
+            type: "mouseleave",
+          });
+        }
+        objCache = null;
+      }
+      //
     });
 
     //判断此次鼠标事件是否是变换事件
@@ -110,6 +155,7 @@ export class TEngine {
       console.log("mousedown");
       transing = true;
     });
+
     //绑定键盘事件
     document.addEventListener("keyup", (event) => {
       if (event.key == "e") {
@@ -138,19 +184,16 @@ export class TEngine {
 
       //规避变换控制器遮挡问题
       this.scene.remove(transformControls);
+
       //第二个参数 只拾取射线第一个穿过的对象
       const interSection = raycaster.intersectObjects(
         this.scene.children,
         true
       );
-      this.scene.add(transformControls);
 
-      let object = new Object3D();
       if (interSection.length) {
-        object = interSection[0].object;
-
-        console.log(interSection);
-        transformControls.attach(object);
+        this.scene.add(transformControls);
+        transformControls.attach(interSection[0].object);
       }
     });
 
