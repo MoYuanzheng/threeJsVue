@@ -8,11 +8,13 @@ import {
   WebGLRenderer,
   MOUSE,
   Object3D,
+  Vector2,
+  Raycaster,
 } from "three";
 
 import Stats from "three/examples/jsm/libs/stats.module";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-
+import { TransformControls } from "three/examples/jsm/controls/TransformControls";
 export class TEngine {
   private dom: HTMLElement;
   private renderer: WebGLRenderer;
@@ -44,7 +46,7 @@ export class TEngine {
     );
     this.scene.add(ambientLight);
     this.scene.add(axesHelper);
-    this.scene.add(gridHelper);
+    //this.scene.add(gridHelper);
 
     //性能监视器
     const stats = Stats();
@@ -55,22 +57,76 @@ export class TEngine {
     statsDom.style.left = "unset";
 
     //初始轨道控制器
-    const orbitControls: OrbitControls = new OrbitControls(
-      this.camera,
-      this.renderer.domElement
-    );
+    // const orbitControls: OrbitControls = new OrbitControls(
+    //   this.camera,
+    //   this.renderer.domElement
+    // );
 
-    orbitControls.mouseButtons = {
-      LEFT: null as unknown as MOUSE,
-      MIDDLE: MOUSE.DOLLY,
-      RIGHT: MOUSE.ROTATE,
-    };
+    // orbitControls.mouseButtons = {
+    //   LEFT: null as unknown as MOUSE,
+    //   MIDDLE: MOUSE.DOLLY,
+    //   RIGHT: MOUSE.ROTATE,
+    // };
 
     //跟随转动
     // orbitControls.autoRotate = true;
 
     //惯性
-    orbitControls.enableDamping = true;
+    //orbitControls.enableDamping = true;
+
+    //初始化变换控制器
+    const transformControls = new TransformControls(
+      this.camera,
+      this.renderer.domElement
+    );
+    this.scene.add(transformControls);
+
+    // const target = new Object3D();
+    // transformControls.attach(target);
+    // this.scene.add(target);
+
+    //射线发射器
+    const raycaster = new Raycaster();
+
+    //添加鼠标事件
+    const mouse = new Vector2();
+    this.renderer.domElement.addEventListener("mousemove", (event) => {
+      const domx = event.offsetX;
+      const domy = event.offsetY;
+      const width = this.renderer.domElement.offsetWidth;
+      const height = this.renderer.domElement.offsetHeight;
+      mouse.x = (domx / width) * 2 - 1;
+      mouse.y = (-domy * 2) / height + 1;
+      //console.log(mouse.x, mouse.y);
+    });
+
+    //点击选定对象
+    this.renderer.domElement.addEventListener("click", (event) => {
+      raycaster.setFromCamera(mouse, this.camera);
+
+      const interSection = raycaster.intersectObjects(this.scene.children);
+
+      if (interSection.length) {
+        const object = interSection[0].object;
+
+        console.log(interSection);
+        transformControls.attach(object);
+      }
+    });
+
+    //点击选定对象
+    // this.renderer.domElement.addEventListener("", (event) => {
+    //   raycaster.setFromCamera(mouse, this.camera);
+
+    //   const interSection = raycaster.intersectObjects(this.scene.children);
+
+    //   if (interSection.length) {
+    //     const object = interSection[0].object;
+
+    //     console.log(interSection);
+    //     transformControls.attach(object);
+    //   }
+    // });
     this.camera.position.set(50, 50, 50);
     this.camera.lookAt(new Vector3(0, 0, 0));
     this.camera.up = new Vector3(1, 1, 1);
@@ -78,7 +134,7 @@ export class TEngine {
 
     //动画 循环
     const renderfun = () => {
-      orbitControls.update();
+      //orbitControls.update();
       this.renderer.render(this.scene, this.camera);
       stats.update();
       requestAnimationFrame(renderfun);
@@ -88,9 +144,10 @@ export class TEngine {
     dom.appendChild(statsDom);
   }
 
-  addObject(...object:Object3D[]){
-    object.forEach(elem =>{
-      this.scene.add(elem)
-    })
+  //添加对象
+  addObject(...object: Object3D[]) {
+    object.forEach((elem) => {
+      this.scene.add(elem);
+    });
   }
 }
