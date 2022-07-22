@@ -44,9 +44,13 @@ export class TEngine {
       "rgb(100,12,222)",
       "rgb(50,150,5)"
     );
+
+    ambientLight.raycast = () => {};
+    axesHelper.raycast = () => {};
+    gridHelper.raycast = () => {};
     this.scene.add(ambientLight);
     this.scene.add(axesHelper);
-    //this.scene.add(gridHelper);
+    this.scene.add(gridHelper);
 
     //性能监视器
     const stats = Stats();
@@ -57,28 +61,27 @@ export class TEngine {
     statsDom.style.left = "unset";
 
     //初始轨道控制器
-    // const orbitControls: OrbitControls = new OrbitControls(
-    //   this.camera,
-    //   this.renderer.domElement
-    // );
+    const orbitControls: OrbitControls = new OrbitControls(
+      this.camera,
+      this.renderer.domElement
+    );
 
-    // orbitControls.mouseButtons = {
-    //   LEFT: null as unknown as MOUSE,
-    //   MIDDLE: MOUSE.DOLLY,
-    //   RIGHT: MOUSE.ROTATE,
-    // };
+    orbitControls.mouseButtons = {
+      RIGHT: MOUSE.ROTATE,
+    };
 
     //跟随转动
     // orbitControls.autoRotate = true;
 
     //惯性
-    //orbitControls.enableDamping = true;
+    orbitControls.enableDamping = true;
 
     //初始化变换控制器
     const transformControls = new TransformControls(
       this.camera,
       this.renderer.domElement
     );
+    // transformControls.raycast = () => {};
     this.scene.add(transformControls);
 
     // const target = new Object3D();
@@ -100,33 +103,57 @@ export class TEngine {
       //console.log(mouse.x, mouse.y);
     });
 
+    //判断此次鼠标事件是否是变换事件
+    let transing = false;
+
+    transformControls.addEventListener("mouseDown", (event) => {
+      console.log("mousedown");
+      transing = true;
+    });
+    //绑定键盘事件
+    document.addEventListener("keyup", (event) => {
+      if (event.key == "e") {
+        transformControls.mode = "scale";
+        return false;
+      }
+      if (event.key == "r") {
+        transformControls.mode = "rotate";
+        return false;
+      }
+      if (event.key == "t") {
+        transformControls.mode = "translate";
+        return false;
+      }
+    });
+
     //点击选定对象
     this.renderer.domElement.addEventListener("click", (event) => {
+      if (transing) {
+        transing = false;
+        return false;
+      }
+      console.log("click");
+
       raycaster.setFromCamera(mouse, this.camera);
 
-      const interSection = raycaster.intersectObjects(this.scene.children);
+      //规避变换控制器遮挡问题
+      this.scene.remove(transformControls);
+      //第二个参数 只拾取射线第一个穿过的对象
+      const interSection = raycaster.intersectObjects(
+        this.scene.children,
+        true
+      );
+      this.scene.add(transformControls);
 
+      let object = new Object3D();
       if (interSection.length) {
-        const object = interSection[0].object;
+        object = interSection[0].object;
 
         console.log(interSection);
         transformControls.attach(object);
       }
     });
 
-    //点击选定对象
-    // this.renderer.domElement.addEventListener("", (event) => {
-    //   raycaster.setFromCamera(mouse, this.camera);
-
-    //   const interSection = raycaster.intersectObjects(this.scene.children);
-
-    //   if (interSection.length) {
-    //     const object = interSection[0].object;
-
-    //     console.log(interSection);
-    //     transformControls.attach(object);
-    //   }
-    // });
     this.camera.position.set(50, 50, 50);
     this.camera.lookAt(new Vector3(0, 0, 0));
     this.camera.up = new Vector3(1, 1, 1);
@@ -134,7 +161,7 @@ export class TEngine {
 
     //动画 循环
     const renderfun = () => {
-      //orbitControls.update();
+      orbitControls.update();
       this.renderer.render(this.scene, this.camera);
       stats.update();
       requestAnimationFrame(renderfun);
