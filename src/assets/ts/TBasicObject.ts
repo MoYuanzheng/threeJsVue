@@ -27,10 +27,10 @@ basicObjectsList.push(box);
 let VPGroup = new Group();
 let tempList: Object3D[] = [];
 //box顶点
+let boxDepth = box.geometry.parameters.depth * box.scale.x;
+let boxWidth = box.geometry.parameters.width * box.scale.y;
+let boxHight = box.geometry.parameters.height * box.scale.z;
 {
-  const boxDepth = box.geometry.parameters.depth * box.scale.x;
-  const boxWidth = box.geometry.parameters.width * box.scale.y;
-  const boxHight = box.geometry.parameters.height * box.scale.z;
   let VertexPoint: Mesh = new Mesh(
     new SphereBufferGeometry(0.2),
     new MeshNormalMaterial()
@@ -87,75 +87,42 @@ let tempList: Object3D[] = [];
 
 box.addEventListener("mouseenter", () => {
   (box.material as MeshStandardMaterial).color = new Color("white");
+  boxDepth = box.geometry.parameters.depth * box.scale.z;
+  boxWidth = box.geometry.parameters.width * box.scale.x;
+  boxHight = box.geometry.parameters.height * box.scale.y;
 });
 
 box.addEventListener("mouseleave", () => {
   (box.material as MeshStandardMaterial).color = new Color("red");
-  console.log(box.rotation._x);
-
-  console.log((box.rotation._x * 180) / Math.PI);
+  console.log(box);
 
   //获取box长宽高，
-  const boxDepth = box.geometry.parameters.depth * box.scale.z;
-  const boxWidth = box.geometry.parameters.width * box.scale.x;
-  const boxHight = box.geometry.parameters.height * box.scale.y;
+  boxDepth = box.geometry.parameters.depth * box.scale.z;
+  boxWidth = box.geometry.parameters.width * box.scale.x;
+  boxHight = box.geometry.parameters.height * box.scale.y;
+
+  VPGroup.position.set(box.position.x, box.position.y, box.position.z);
 
   let boxVertex = new Array();
-  boxVertex[0] = [
-    box.position.x - boxWidth / 2,
-    box.position.y + boxHight / 2,
-    box.position.z - boxDepth / 2,
-  ];
-  boxVertex[1] = [
-    box.position.x + boxWidth / 2,
-    box.position.y + boxHight / 2,
-    box.position.z - boxDepth / 2,
-  ];
-  boxVertex[2] = [
-    box.position.x - boxWidth / 2,
-    box.position.y + boxHight / 2,
-    box.position.z + boxDepth / 2,
-  ];
-  boxVertex[3] = [
-    box.position.x + boxWidth / 2,
-    box.position.y + boxHight / 2,
-    box.position.z + boxDepth / 2,
-  ];
-  boxVertex[4] = [
-    box.position.x - boxWidth / 2,
-    box.position.y - boxHight / 2,
-    box.position.z - boxDepth / 2,
-  ];
-  boxVertex[5] = [
-    box.position.x + boxWidth / 2,
-    box.position.y - boxHight / 2,
-    box.position.z - boxDepth / 2,
-  ];
-  boxVertex[6] = [
-    box.position.x - boxWidth / 2,
-    box.position.y - boxHight / 2,
-    box.position.z + boxDepth / 2,
-  ];
-  boxVertex[7] = [
-    box.position.x + boxWidth / 2,
-    box.position.y - boxHight / 2,
-    box.position.z + boxDepth / 2,
-  ];
-  // VPGroup.rotateX.set = ;
-  // VPGroup.rotateY = ;
-  // VPGroup.rotateZ = box.rotation._z;
+  boxVertex[0] = [-boxWidth / 2, +boxHight / 2, -boxDepth / 2];
+  boxVertex[1] = [+boxWidth / 2, +boxHight / 2, -boxDepth / 2];
+  boxVertex[2] = [-boxWidth / 2, +boxHight / 2, +boxDepth / 2];
+  boxVertex[3] = [+boxWidth / 2, +boxHight / 2, +boxDepth / 2];
+  boxVertex[4] = [-boxWidth / 2, -boxHight / 2, -boxDepth / 2];
+  boxVertex[5] = [+boxWidth / 2, -boxHight / 2, -boxDepth / 2];
+  boxVertex[6] = [-boxWidth / 2, -boxHight / 2, +boxDepth / 2];
+  boxVertex[7] = [+boxWidth / 2, -boxHight / 2, +boxDepth / 2];
 
-  // let vectorBoxPosi = new Vector3();
-  // vectorBoxPosi.x = box.position.x;
-  // vectorBoxPosi.y = box.position.y;
-  // vectorBoxPosi.z = box.position.z;
   for (let i = 0; i <= 7; i++) {
     tempList[i].position.set(boxVertex[i][0], boxVertex[i][1], boxVertex[i][2]);
-    // tempList[i].rotateOnAxis(vectorBoxPosi, box.rotation._x);
-    // tempList[i].rotateY = box.rotateY;
-    // tempList[i].rotateZ = box.rotateZ;
   }
   VPGroup.rotation.set(box.rotation._x, box.rotation._y, box.rotation._z);
+
+  console.log("GROUP POSITION");
+  console.log(VPGroup);
+
+  console.log("BOX POSITION");
+  console.log(box.position);
 });
 
 basicObjectsList.push(box);
