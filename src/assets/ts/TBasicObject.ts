@@ -91,6 +91,9 @@ box.addEventListener("mouseenter", () => {
 
 box.addEventListener("mouseleave", () => {
   (box.material as MeshStandardMaterial).color = new Color("red");
+  console.log(box.rotation._x);
+
+  console.log((box.rotation._x * 180) / Math.PI);
 
   //获取box长宽高，
   const boxDepth = box.geometry.parameters.depth * box.scale.z;
@@ -138,9 +141,21 @@ box.addEventListener("mouseleave", () => {
     box.position.y - boxHight / 2,
     box.position.z + boxDepth / 2,
   ];
+  // VPGroup.rotateX.set = ;
+  // VPGroup.rotateY = ;
+  // VPGroup.rotateZ = box.rotation._z;
+
+  // let vectorBoxPosi = new Vector3();
+  // vectorBoxPosi.x = box.position.x;
+  // vectorBoxPosi.y = box.position.y;
+  // vectorBoxPosi.z = box.position.z;
   for (let i = 0; i <= 7; i++) {
     tempList[i].position.set(boxVertex[i][0], boxVertex[i][1], boxVertex[i][2]);
+    // tempList[i].rotateOnAxis(vectorBoxPosi, box.rotation._x);
+    // tempList[i].rotateY = box.rotateY;
+    // tempList[i].rotateZ = box.rotateZ;
   }
+  VPGroup.rotation.set(box.rotation._x, box.rotation._y, box.rotation._z);
 });
 
 basicObjectsList.push(box);
