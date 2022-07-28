@@ -13,6 +13,7 @@ export default defineComponent({
   setup() {
     const threeTarget = ref(null)
     onMounted(() => {
+      // @ts-ignore
       const TE = new TEngine(threeTarget.value)
       TE.addObject(...basicObjectsList)
 

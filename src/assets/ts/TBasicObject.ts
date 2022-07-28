@@ -27,8 +27,11 @@ basicObjectsList.push(box);
 let VPGroup = new Group();
 let tempList: Object3D[] = [];
 //box顶点
-let boxDepth = box.geometry.parameters.depth * box.scale.x;
-let boxWidth = box.geometry.parameters.width * box.scale.y;
+// @ts-ignore
+let boxDepth = box.geometry.parameters.depth * box.scale.x; 
+// @ts-ignore
+let boxWidth = box.geometry.parameters.width * box.scale.y; 
+// @ts-ignore
 let boxHight = box.geometry.parameters.height * box.scale.z;
 {
   let VertexPoint: Mesh = new Mesh(
@@ -87,9 +90,6 @@ let boxHight = box.geometry.parameters.height * box.scale.z;
 
 box.addEventListener("mouseenter", () => {
   (box.material as MeshStandardMaterial).color = new Color("white");
-  boxDepth = box.geometry.parameters.depth * box.scale.z;
-  boxWidth = box.geometry.parameters.width * box.scale.x;
-  boxHight = box.geometry.parameters.height * box.scale.y;
 });
 
 box.addEventListener("mouseleave", () => {
@@ -97,8 +97,11 @@ box.addEventListener("mouseleave", () => {
   console.log(box);
 
   //获取box长宽高，
+  // @ts-ignore
   boxDepth = box.geometry.parameters.depth * box.scale.z;
+  // @ts-ignore
   boxWidth = box.geometry.parameters.width * box.scale.x;
+  // @ts-ignore
   boxHight = box.geometry.parameters.height * box.scale.y;
 
   VPGroup.position.set(box.position.x, box.position.y, box.position.z);
@@ -116,6 +119,7 @@ box.addEventListener("mouseleave", () => {
   for (let i = 0; i <= 7; i++) {
     tempList[i].position.set(boxVertex[i][0], boxVertex[i][1], boxVertex[i][2]);
   }
+  // @ts-ignore
   VPGroup.rotation.set(box.rotation._x, box.rotation._y, box.rotation._z);
 
   console.log("GROUP POSITION");

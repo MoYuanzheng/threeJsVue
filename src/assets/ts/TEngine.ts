@@ -10,6 +10,10 @@ import {
   Object3D,
   Vector2,
   Raycaster,
+  Mesh,
+  MeshNormalMaterial,
+  MeshStandardMaterial,
+  BoxBufferGeometry,
 } from "three";
 
 import Stats from "three/examples/jsm/libs/stats.module";
@@ -170,6 +174,15 @@ export class TEngine {
         transformControls.mode = "translate";
         return false;
       }
+      if (event.key == "a") {
+        const box: Mesh = new Mesh(
+          new BoxBufferGeometry(8, 8, 8),
+          new MeshNormalMaterial()
+        );
+
+        this.scene.add(box);
+        return false;
+      }
     });
 
     //点击选定对象
@@ -194,6 +207,8 @@ export class TEngine {
       if (interSection.length) {
         this.scene.add(transformControls);
         transformControls.attach(interSection[0].object);
+
+        console.log(interSection[0].object.position);
       }
     });
 
